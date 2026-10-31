@@ -68,6 +68,21 @@ Firebase 키 파일은 base64 로 바꿔서 넣습니다. PowerShell 에서 (파
 
 - [x] 완료
 
+## 5. Vercel Blob (엄마 사진 저장소)  ← 지금 필요
+
+1. https://vercel.com → **momcipe** 프로젝트 → 위쪽 **Storage** 탭
+2. **Create Database** → **Blob** → 이름 `momcipe-photos` → 지역은 **Seoul (icn1)** 이 있으면 선택 → **Create**
+3. 프로젝트에 연결(Connect)할지 물으면 **momcipe** 에 연결 (환경은 전부 체크해도 됨)
+4. 만들어진 스토어 화면의 **.env.local** 탭(또는 Quickstart)에서 `BLOB_READ_WRITE_TOKEN` 값의 **복사 버튼** 클릭
+   - 값은 `vercel_blob_rw_` 로 시작합니다. 따옴표는 빼고 값만 복사
+5. 맘시피 폴더 터미널(PowerShell)에서:
+
+```powershell
+$t=(Get-Clipboard -Raw).Trim().Trim('"'); if ($t -match '^vercel_blob_rw_[A-Za-z0-9_]+$') { gh secret set BLOB_READ_WRITE_TOKEN --body $t; "등록 완료" } else { "형식이 달라요 - vercel_blob_rw_ 로 시작하는 값만 복사해 주세요" }; Remove-Variable t
+```
+
+- [ ] 완료
+
 ## 참고
 
 - git 설정의 이메일이 `https://github.com/jihoon-devstu` (URL) 로 되어 있어 커밋이 GitHub 계정과 연결되지 않습니다.
