@@ -45,12 +45,20 @@ npm run dev
 | `MOMCIPE_ID` | 엄마 로그인 아이디 |
 | `MOMCIPE_PW` | 엄마 로그인 비밀번호 |
 | `FIREBASE_SERVICE_ACCOUNT` | Firebase 서비스 계정 JSON 을 base64 로 인코딩한 값 |
+| `BLOB_READ_WRITE_TOKEN` | Vercel Blob 스토어 토큰 (엄마가 올린 사진 저장) |
 | `VERCEL_TOKEN` | Vercel 액세스 토큰 |
 | `VERCEL_ORG_ID` | `.vercel/project.json` 의 `orgId` |
 | `VERCEL_PROJECT_ID` | `.vercel/project.json` 의 `projectId` |
 
 `main` 에 푸시하면 운영 배포, PR 을 열면 미리보기 배포 후 PR 에 주소가 댓글로 달린다.
 Vercel 의 Git 자동 배포는 `vercel.json` 에서 꺼두었다 (비밀값이 Actions 를 통해서만 들어가도록).
+
+## 우리 집 사진 올리기
+
+로그인하면 상세 페이지 사진 위에 **사진 바꾸기** 버튼이, 편집 화면 기본 정보에 **우리 집 사진 올리기** 버튼이 생긴다.
+휴대폰에선 카메라로 바로 찍거나 앨범에서 고를 수 있다. 브라우저에서 긴 변 1600px JPEG 로 줄여 올리고,
+사진을 바꾸면 이전에 올린 사진은 Blob 에서 지운다 (기본 제공 사진은 그대로).
+`BLOB_READ_WRITE_TOKEN` 이 없으면 로컬 개발용으로 `public/uploads/` 에 저장한다.
 
 ## 사진 다시 받기
 

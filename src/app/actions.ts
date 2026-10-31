@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { checkLogin, endSession, isEditor, loginConfigured, startSession } from "@/lib/auth";
+import { deletePhoto, isUploadedPhoto } from "@/lib/photos";
 import { deleteRecipe, getRecipe, listRecipes, saveRecipe } from "@/lib/store";
 import { CATEGORIES, type Recipe, type RecipeInput } from "@/lib/types";
 
@@ -37,7 +38,7 @@ function sanitize(input: RecipeInput): RecipeInput {
   return {
     name: name.slice(0, 60),
     category: input.category,
-    image: input.image?.startsWith("/images/") ? input.image : undefined,
+    image: input.image?.startsWith("/images/") || isUploadedPhoto(input.image) ? input.image : undefined,
     intro: input.intro?.trim().slice(0, 300) || undefined,
     servings: input.servings?.trim().slice(0, 30) || undefined,
     tips: input.tips?.trim().slice(0, 2000) || undefined,
@@ -73,7 +74,8 @@ export async function saveRecipeAction(id: string | null, input: RecipeInput): P
     if (id) {
       const prev = await getRecipe(id);
       if (!prev) return { error: "레시피를 찾을 수 없어요." };
-      recipe = { ...prev, ...data, image: data.image ?? prev.image, updatedAt: now };
+      recipe = { ...prev, ...data, updatedAt: now };
+      if (prev.image !== recipe.image) await deletePhoto(prev.image);
     } else {
       const all = await listRecipes();
       recipe = {
@@ -93,8 +95,26 @@ export async function saveRecipeAction(id: string | null, input: RecipeInput): P
   }
 }
 
+/** 상세 페이지에서 사진만 바로 바꿀 때 */
+export async function setRecipeImageAction(id: string, image: string): Promise<{ error?: string }> {
+  try {
+    await requireEditor();
+    if (!isUploadedPhoto(image)) return { error: "올린 사진을 찾을 수 없어요." };
+    const prev = await getRecipe(id);
+    if (!prev) return { error: "레시피를 찾을 수 없어요." };
+    await saveRecipe({ ...prev, image, updatedAt: Date.now() });
+    if (prev.image !== image) await deletePhoto(prev.image);
+    revalidatePath("/");
+    revalidatePath(`/recipes/${id}`);
+    return {};
+  } catch (e) {
+    return { error: e instanceof Error ? e.message : "사진을 바꾸지 못했어요." };
+  }
+}
+
 export async function deleteRecipeAction(id: string) {
   await requireEditor();
+  await deletePhoto((await getRecipe(id))?.image);
   await deleteRecipe(id);
   revalidatePath("/");
   redirect("/");

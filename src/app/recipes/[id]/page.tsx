@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { ChangePhoto } from "@/components/ChangePhoto";
 import { IngredientIcon } from "@/components/IngredientIcon";
 import { ReadingTools } from "@/components/ReadingTools";
 import { RecipeImage } from "@/components/RecipeImage";
@@ -93,6 +94,11 @@ export default async function RecipePage({ params }: Props) {
       <header>
         <div className="relative aspect-[16/9] overflow-hidden rounded-2xl border border-line bg-card">
           <RecipeImage src={recipe.image} name={recipe.name} category={recipe.category} sizes="(min-width: 768px) 720px, 100vw" priority />
+          {editor && (
+            <div className="absolute right-3 bottom-3">
+              <ChangePhoto recipeId={recipe.id} hasPhoto={Boolean(recipe.image)} />
+            </div>
+          )}
         </div>
         {credit && (
           <p className="mt-1.5 text-right text-xs text-ink-faint">
