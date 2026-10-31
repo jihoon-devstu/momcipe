@@ -38,5 +38,36 @@ export function RecipeImage({
   priority?: boolean;
 }) {
   if (!src) return <Placeholder category={category} name={name} />;
-  return <Image src={src} alt={name} fill sizes={sizes} priority={priority} className="object-cover" />;
+  // 사진은 자르지 않고 칸 안에 통째로 맞춘다. 남는 여백은 같은 사진을 흐리게 깔아 채운다.
+  return (
+    <>
+      <Image src={src} alt="" aria-hidden fill sizes="64px" className="scale-110 object-cover opacity-60 blur-xl" />
+      <Image src={src} alt={name} fill sizes={sizes} priority={priority} className="object-contain" />
+    </>
+  );
+}
+
+/** 상세 페이지 대표 사진: 칸 비율에 맞추지 않고 사진 원래 비율 그대로 보여준다 */
+export function RecipeHeroImage({ src, name, category }: { src?: string; name: string; category: Category }) {
+  if (!src) {
+    return (
+      <div className="aspect-[16/9]">
+        <Placeholder category={category} name={name} />
+      </div>
+    );
+  }
+  return (
+    <>
+      <Image src={src} alt="" aria-hidden fill sizes="64px" className="scale-110 object-cover opacity-50 blur-2xl" />
+      <Image
+        src={src}
+        alt={name}
+        width={1600}
+        height={1200}
+        sizes="(min-width: 768px) 720px, 100vw"
+        priority
+        className="relative mx-auto block h-auto max-h-[75vh] w-auto max-w-full"
+      />
+    </>
+  );
 }

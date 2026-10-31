@@ -424,8 +424,8 @@ export function RecipeEditor({ recipe, images }: { recipe: Recipe | null; images
                 />
               </div>
               {image && !images.includes(image) && (
-                <div className="relative mb-3 aspect-[16/9] max-w-md overflow-hidden rounded-xl border-2 border-clay">
-                  <Image src={image} alt="올린 사진" fill sizes="448px" className="object-cover" />
+                <div className="relative mb-3 aspect-[4/3] max-w-md overflow-hidden rounded-xl border-2 border-clay bg-card">
+                  <Image src={image} alt="올린 사진" fill sizes="448px" className="object-contain" />
                   <span className="absolute top-2 left-2 rounded-full bg-clay px-3 py-0.5 text-sm font-semibold text-white">
                     우리 집 사진
                   </span>
