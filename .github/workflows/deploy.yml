@@ -1,0 +1,74 @@
+name: Deploy
+
+# main 에 푸시되면 운영 배포, PR 이 열리면 미리보기 배포.
+# 아이디/비밀번호 등 비밀값은 GitHub Secrets 에서 꺼내 Vercel 런타임 환경변수로만 넘긴다.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+concurrency:
+  group: deploy-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+  VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm run build
+
+  deploy:
+    needs: check
+    runs-on: ubuntu-latest
+    # 포크에서 온 PR 에는 비밀값이 없으므로 배포하지 않는다
+    if: github.event_name == 'push' || github.event.pull_request.head.repo.full_name == github.repository
+    permissions:
+      contents: read
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm install --global vercel@latest
+
+      - name: Deploy to Vercel
+        id: deploy
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          MOMCIPE_ID: ${{ secrets.MOMCIPE_ID }}
+          MOMCIPE_PW: ${{ secrets.MOMCIPE_PW }}
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+        run: |
+          PROD_FLAG=""
+          if [ "${{ github.event_name }}" = "push" ]; then PROD_FLAG="--prod"; fi
+          url=$(vercel deploy $PROD_FLAG --yes --token "$VERCEL_TOKEN" \
+            --env MOMCIPE_ID="$MOMCIPE_ID" \
+            --env MOMCIPE_PW="$MOMCIPE_PW" \
+            --env FIREBASE_SERVICE_ACCOUNT="$FIREBASE_SERVICE_ACCOUNT")
+          echo "url=$url" >> "$GITHUB_OUTPUT"
+          echo "### 배포 완료: $url" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Comment preview URL
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            await github.rest.issues.createComment({
+              ...context.repo,
+              issue_number: context.issue.number,
+              body: `미리보기 배포: ${{ steps.deploy.outputs.url }}`,
+            });

@@ -1,0 +1,62 @@
+@import "tailwindcss";
+
+@theme {
+  --color-paper: #fbf6ee;
+  --color-card: #fffdf8;
+  --color-line: #e7dac6;
+  --color-line-strong: #d3c0a3;
+  --color-ink: #3a2a20;
+  --color-ink-soft: #6e5a4b;
+  --color-ink-faint: #9c8877;
+  --color-clay: #b75d38;
+  --color-clay-dark: #974526;
+  --color-clay-soft: #f3e1d3;
+  --color-sage: #6f7d4f;
+  --color-sage-soft: #e7ead8;
+  --color-butter: #f6e7c1;
+
+  --font-sans: "Pretendard Variable", Pretendard, -apple-system, "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+  --font-serif: var(--font-gowun), "Nanum Myeongjo", serif;
+}
+
+@layer base {
+  html {
+    background: var(--color-paper);
+    color: var(--color-ink);
+    -webkit-text-size-adjust: 100%;
+    word-break: keep-all;
+  }
+  body {
+    font-family: var(--font-sans);
+    font-size: 18px;
+    line-height: 1.65;
+    /* 오래된 레시피 노트 같은 아주 옅은 종이 질감 */
+    background-image: radial-gradient(rgb(160 120 80 / 0.045) 1px, transparent 1px);
+    background-size: 5px 5px;
+  }
+  ::selection {
+    background: var(--color-butter);
+  }
+  :focus-visible {
+    outline: 2px solid var(--color-clay);
+    outline-offset: 2px;
+  }
+  input,
+  select,
+  textarea {
+    font: inherit;
+  }
+}
+
+@utility field {
+  @apply w-full rounded-lg border border-line-strong bg-white px-4 py-3 text-lg text-ink placeholder:text-ink-faint focus:border-clay focus:outline-none;
+}
+@utility btn {
+  @apply inline-flex cursor-pointer items-center justify-center gap-2 rounded-full px-5 py-2.5 text-base font-semibold transition-colors disabled:cursor-default disabled:opacity-50;
+}
+@utility btn-primary {
+  @apply btn bg-clay text-white hover:bg-clay-dark;
+}
+@utility btn-ghost {
+  @apply btn border border-line-strong bg-card text-ink hover:bg-clay-soft;
+}

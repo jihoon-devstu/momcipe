@@ -1,0 +1,11 @@
+rules_version = '2';
+
+// 맘시피는 서버(Firebase Admin SDK)에서만 Firestore 를 읽고 쓴다.
+// Admin SDK 는 이 규칙을 우회하므로, 브라우저에서 직접 들어오는 접근은 전부 막아둔다.
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

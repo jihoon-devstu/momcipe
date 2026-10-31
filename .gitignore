@@ -1,0 +1,17 @@
+node_modules/
+.next/
+out/
+.vercel/
+*.tsbuildinfo
+next-env.d.ts
+
+# 로컬 비밀값
+.env
+.env*.local
+service-account*.json
+
+# 로컬 개발용 레시피 저장소 (Firebase 미연결 시)
+.data/
+
+.DS_Store
+Thumbs.db
