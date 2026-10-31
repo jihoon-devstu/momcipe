@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { useRef, useState, useTransition } from "react";
 import { deleteRecipeAction, saveRecipeAction } from "@/app/actions";
 import { IngredientIcon } from "@/components/IngredientIcon";
+import { PhotoButton } from "@/components/PhotoUpload";
 import { CUTS, INGREDIENT_GROUPS, UNITS, findIngredient, type IngredientDef } from "@/lib/ingredients";
 import { CATEGORIES, type Category, type IngredientEntry, type Recipe } from "@/lib/types";
 
@@ -414,7 +415,25 @@ export function RecipeEditor({ recipe, images }: { recipe: Recipe | null; images
               </label>
             </div>
             <div>
-              <span className="mb-1.5 block text-lg font-semibold">사진</span>
+              <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
+                <span className="text-lg font-semibold">대표 사진</span>
+                <PhotoButton
+                  recipeId={recipe?.id ?? "new"}
+                  label={image && !images.includes(image) ? "다른 사진으로 바꾸기" : "우리 집 사진 올리기"}
+                  onUploaded={(url) => setImage(url)}
+                />
+              </div>
+              {image && !images.includes(image) && (
+                <div className="relative mb-3 aspect-[16/9] max-w-md overflow-hidden rounded-xl border-2 border-clay">
+                  <Image src={image} alt="올린 사진" fill sizes="448px" className="object-cover" />
+                  <span className="absolute top-2 left-2 rounded-full bg-clay px-3 py-0.5 text-sm font-semibold text-white">
+                    우리 집 사진
+                  </span>
+                </div>
+              )}
+              <p className="mb-2 text-[15px] text-ink-faint">
+                {image && !images.includes(image) ? "저장하면 이 사진이 대표 사진이 돼요. 아래 기본 사진으로 되돌릴 수도 있어요." : "또는 기본 사진 중에서 고르세요."}
+              </p>
               <div className="flex gap-2 overflow-x-auto pb-2">
                 <button
                   onClick={() => setImage(undefined)}

@@ -51,9 +51,10 @@ jobs:
           MOMCIPE_ID: ${{ secrets.MOMCIPE_ID }}
           MOMCIPE_PW: ${{ secrets.MOMCIPE_PW }}
           FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          BLOB_READ_WRITE_TOKEN: ${{ secrets.BLOB_READ_WRITE_TOKEN }}
         run: |
           missing=""
-          for name in VERCEL_ORG_ID VERCEL_PROJECT_ID VERCEL_TOKEN MOMCIPE_ID MOMCIPE_PW FIREBASE_SERVICE_ACCOUNT; do
+          for name in VERCEL_ORG_ID VERCEL_PROJECT_ID VERCEL_TOKEN MOMCIPE_ID MOMCIPE_PW FIREBASE_SERVICE_ACCOUNT BLOB_READ_WRITE_TOKEN; do
             if [ -z "${!name}" ]; then missing="$missing $name"; fi
           done
           if [ -n "$missing" ]; then
@@ -68,13 +69,15 @@ jobs:
           MOMCIPE_ID: ${{ secrets.MOMCIPE_ID }}
           MOMCIPE_PW: ${{ secrets.MOMCIPE_PW }}
           FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          BLOB_READ_WRITE_TOKEN: ${{ secrets.BLOB_READ_WRITE_TOKEN }}
         run: |
           PROD_FLAG=""
           if [ "${{ github.event_name }}" = "push" ]; then PROD_FLAG="--prod"; fi
           url=$(vercel deploy $PROD_FLAG --yes --token "$VERCEL_TOKEN" \
             --env MOMCIPE_ID="$MOMCIPE_ID" \
             --env MOMCIPE_PW="$MOMCIPE_PW" \
-            --env FIREBASE_SERVICE_ACCOUNT="$FIREBASE_SERVICE_ACCOUNT")
+            --env FIREBASE_SERVICE_ACCOUNT="$FIREBASE_SERVICE_ACCOUNT" \
+            --env BLOB_READ_WRITE_TOKEN="$BLOB_READ_WRITE_TOKEN")
           echo "url=$url" >> "$GITHUB_OUTPUT"
           echo "### 배포 완료: $url" >> "$GITHUB_STEP_SUMMARY"
 
