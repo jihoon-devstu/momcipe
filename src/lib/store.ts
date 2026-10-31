@@ -25,7 +25,14 @@ async function firestoreStore(): Promise<Store> {
     const json = raw.startsWith("{") ? raw : Buffer.from(raw, "base64").toString("utf8");
     initializeApp({ credential: cert(JSON.parse(json)) });
   }
-  const col = getFirestore().collection(COLLECTION);
+  const db = getFirestore();
+  // 사진 없는 레시피의 image 처럼 비어 있는 선택 항목은 저장하지 않고 건너뛴다
+  try {
+    db.settings({ ignoreUndefinedProperties: true });
+  } catch {
+    // 개발 서버 재시작 등으로 이미 설정된 경우
+  }
+  const col = db.collection(COLLECTION);
   return {
     async list() {
       const snap = await col.get();
