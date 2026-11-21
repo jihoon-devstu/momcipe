@@ -3,10 +3,11 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useRef, useState, useTransition } from "react";
+import { useState, useTransition } from "react";
 import { deleteRecipeAction, saveRecipeAction } from "@/app/actions";
 import { IngredientIcon } from "@/components/IngredientIcon";
 import { PhotoButton } from "@/components/PhotoUpload";
+import { StepList } from "@/components/StepList";
 import { CUTS, INGREDIENT_GROUPS, UNITS, findIngredient, type IngredientDef } from "@/lib/ingredients";
 import { CATEGORIES, type Category, type IngredientEntry, type Recipe } from "@/lib/types";
 
@@ -213,100 +214,6 @@ function SelectedIngredient({
   );
 }
 
-/* ---------- 순서 적기 ---------- */
-
-function StepList({
-  steps,
-  onChange,
-  placeholder,
-  chips,
-}: {
-  steps: string[];
-  onChange: (steps: string[]) => void;
-  placeholder: string;
-  chips: string[];
-}) {
-  const refs = useRef<(HTMLTextAreaElement | null)[]>([]);
-  const [focused, setFocused] = useState(0);
-  const list = steps.length ? steps : [""];
-
-  const set = (i: number, v: string) => onChange(list.map((s, j) => (j === i ? v : s)));
-  const move = (i: number, d: -1 | 1) => {
-    const next = [...list];
-    [next[i], next[i + d]] = [next[i + d], next[i]];
-    onChange(next);
-  };
-  const add = () => {
-    onChange([...list, ""]);
-    setTimeout(() => refs.current[list.length]?.focus(), 0);
-  };
-  const insert = (text: string) => {
-    const el = refs.current[focused];
-    const cur = list[focused] ?? "";
-    const pos = el?.selectionStart ?? cur.length;
-    const glue = pos > 0 && !/\s$/.test(cur.slice(0, pos)) ? " " : "";
-    set(focused, cur.slice(0, pos) + glue + text + cur.slice(pos));
-    setTimeout(() => el?.focus(), 0);
-  };
-
-  return (
-    <div>
-      {chips.length > 0 && (
-        <div className="mb-4 rounded-xl bg-butter/50 p-3">
-          <p className="mb-2 text-sm text-ink-soft">재료를 누르면 지금 쓰는 칸에 들어가요</p>
-          <div className="flex flex-wrap gap-1.5">
-            {chips.map((c) => (
-              <button
-                key={c}
-                type="button"
-                onMouseDown={(e) => e.preventDefault()}
-                onClick={() => insert(c)}
-                className="cursor-pointer rounded-full border border-line-strong bg-white px-3 py-1 text-[15px] hover:border-clay"
-              >
-                {c}
-              </button>
-            ))}
-          </div>
-        </div>
-      )}
-      <ol className="space-y-3">
-        {list.map((s, i) => (
-          <li key={i} className="flex gap-3">
-            <span className="mt-2 flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-ink font-serif text-lg font-bold text-white">
-              {i + 1}
-            </span>
-            <textarea
-              ref={(el) => {
-                refs.current[i] = el;
-              }}
-              value={s}
-              onFocus={() => setFocused(i)}
-              onChange={(e) => set(i, e.target.value)}
-              rows={Math.max(2, Math.ceil(s.length / 32))}
-              placeholder={i === 0 ? placeholder : "다음엔 어떻게 하나요?"}
-              className="field min-h-20 flex-1 resize-y text-xl leading-relaxed"
-            />
-            <div className="flex flex-col gap-1 pt-1">
-              <button type="button" disabled={i === 0} onClick={() => move(i, -1)} className="cursor-pointer rounded px-2 py-1 text-ink-faint hover:bg-clay-soft disabled:invisible" aria-label="위로">
-                ▲
-              </button>
-              <button type="button" disabled={i === list.length - 1} onClick={() => move(i, 1)} className="cursor-pointer rounded px-2 py-1 text-ink-faint hover:bg-clay-soft disabled:invisible" aria-label="아래로">
-                ▼
-              </button>
-              <button type="button" onClick={() => onChange(list.filter((_, j) => j !== i))} className="cursor-pointer rounded px-2 py-1 text-ink-faint hover:bg-clay-soft hover:text-clay-dark" aria-label="삭제">
-                ✕
-              </button>
-            </div>
-          </li>
-        ))}
-      </ol>
-      <button type="button" onClick={add} className="btn-ghost mt-4 ml-12">
-        + 순서 추가
-      </button>
-    </div>
-  );
-}
-
 /* ---------- 편집기 ---------- */
 
 export function RecipeEditor({ recipe, images }: { recipe: Recipe | null; images: string[] }) {
@@ -356,7 +263,7 @@ export function RecipeEditor({ recipe, images }: { recipe: Recipe | null; images
   return (
     <div className="mx-auto max-w-4xl px-4 pb-40 sm:px-6">
       <div className="flex items-center justify-between gap-3 py-5">
-        <Link href={recipe ? `/recipes/${recipe.id}` : "/"} className="text-[15px] text-ink-soft hover:text-clay">
+        <Link href={recipe ? `/recipes/${recipe.id}` : "/cooking"} className="text-[15px] text-ink-soft hover:text-clay">
           ← 나가기
         </Link>
         <p className="text-[15px] text-ink-faint">{recipe ? "레시피 고치기" : "새 레시피 적기"}</p>
@@ -364,7 +271,7 @@ export function RecipeEditor({ recipe, images }: { recipe: Recipe | null; images
       <h1 className="font-serif text-3xl font-bold sm:text-4xl">{name || "이름 없는 요리"}</h1>
 
       {/* 단계 표시 */}
-      <ol className="sticky top-[61px] z-20 -mx-4 mt-5 flex gap-1 overflow-x-auto border-b border-line bg-paper/95 px-4 py-3 backdrop-blur-sm sm:-mx-6 sm:px-6">
+      <ol className="sticky top-[var(--header-h)] z-20 -mx-4 mt-5 flex gap-1 overflow-x-auto border-b border-line bg-paper/95 px-4 py-3 backdrop-blur-sm sm:-mx-6 sm:px-6">
         {STEPS.map((s, i) => (
           <li key={s.id}>
             <button

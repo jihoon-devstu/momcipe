@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ChangePhoto } from "@/components/ChangePhoto";
 import { IngredientIcon } from "@/components/IngredientIcon";
+import { MomTip, SectionTitle, Steps } from "@/components/Reading";
 import { ReadingTools } from "@/components/ReadingTools";
 import { RecipeHeroImage } from "@/components/RecipeImage";
 import { isEditor } from "@/lib/auth";
@@ -38,35 +39,6 @@ function IngredientRow({ item }: { item: IngredientEntry }) {
   );
 }
 
-function SectionTitle({ n, title, sub }: { n: number; title: string; sub?: string }) {
-  return (
-    <div className="mb-5 flex items-baseline gap-3 border-b-2 border-ink pb-2">
-      <span className="font-serif text-[0.9em] text-clay">{n}</span>
-      <h2 className="font-serif text-[1.55em] font-bold">{title}</h2>
-      {sub && <span className="text-[0.8em] text-ink-faint">{sub}</span>}
-    </div>
-  );
-}
-
-function Steps({ steps, big }: { steps: string[]; big?: boolean }) {
-  return (
-    <ol className="space-y-5">
-      {steps.map((s, i) => (
-        <li key={i} className="flex gap-4">
-          <span
-            className={`flex shrink-0 items-center justify-center rounded-full font-serif font-bold ${
-              big ? "h-[2.1em] w-[2.1em] bg-ink text-white" : "h-[1.8em] w-[1.8em] border-2 border-ink-soft text-ink-soft"
-            }`}
-          >
-            {i + 1}
-          </span>
-          <p className={`whitespace-pre-line pt-[0.15em] ${big ? "text-[1.12em] leading-[1.7]" : ""}`}>{s}</p>
-        </li>
-      ))}
-    </ol>
-  );
-}
-
 export default async function RecipePage({ params }: Props) {
   const { id } = await params;
   const [recipe, editor] = await Promise.all([getRecipe(id), isEditor()]);
@@ -81,7 +53,7 @@ export default async function RecipePage({ params }: Props) {
   return (
     <article className="mx-auto max-w-3xl px-4 pb-10 sm:px-6">
       <nav className="flex items-center justify-between gap-3 py-5 text-[15px]">
-        <Link href={`/#${category.id}`} className="text-ink-soft hover:text-clay">
+        <Link href={`/cooking#${category.id}`} className="text-ink-soft hover:text-clay">
           ← {category.label} 목록
         </Link>
         {editor && (
@@ -177,12 +149,7 @@ export default async function RecipePage({ params }: Props) {
             <Steps steps={recipe.cookSteps} big />
           </section>
 
-          {recipe.tips && (
-            <aside className="rounded-xl border-l-4 border-butter bg-card p-5 sm:p-6">
-              <h3 className="mb-2 font-serif text-[1.1em] font-bold">엄마의 한마디</h3>
-              <p className="whitespace-pre-line text-ink-soft">{recipe.tips}</p>
-            </aside>
-          )}
+          {recipe.tips && <MomTip text={recipe.tips} />}
         </div>
       )}
     </article>

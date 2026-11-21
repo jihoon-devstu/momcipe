@@ -1,7 +1,11 @@
-# 맘시피 (momcipe)
+# 맘살림 (저장소 이름: momcipe)
 
-엄마의 레시피를 모아두는 웹사이트. 국 · 찌개 · 요리 · 반찬 네 갈래로 나뉜 레시피 카드를 누르면
-큰 글씨로 된 상세 페이지가 열리고, 엄마는 로그인해서 재료 아이콘을 골라가며 레시피를 적는다.
+엄마가 알려주는 살림 노트. 청소 · 빨래 · 기타 집안일 · 요리 네 갈래로 나뉜다.
+
+- **첫 화면**: 주기가 된 집안일이 '오늘 할 일'로 올라오고, '오늘 했어요'로 기록한다.
+- **청소 / 기타 집안일** (`/cleaning`, `/chores`): 준비물 · 하는 순서 · 팁 + 주기(매일, 3일, 매주, 매달 …)와 한 날 기록.
+- **빨래** (`/laundry`): 세탁기 설정(코스 · 물 온도 · 헹굼 · 탈수 · 세탁망), 넣는 것, 빨래 순서, 말리는 법.
+- **요리** (`/cooking`): 국 · 찌개 · 요리 · 반찬 레시피 (예전 맘시피).
 
 ## 구성
 
@@ -9,7 +13,7 @@
 |---|---|
 | 프레임워크 | Next.js 16 (App Router) + React 19 |
 | 스타일 | Tailwind CSS 4 · Pretendard / 고운바탕 |
-| DB | Firebase Firestore (서버에서 Admin SDK 로만 접근) |
+| DB | Firebase Firestore — `recipes`, `guides` 두 컬렉션 (서버에서 Admin SDK 로만 접근) |
 | 로그인 | 아이디/비밀번호 → 서명된 httpOnly 쿠키 (30일) |
 | 배포 | GitHub Actions → Vercel CLI |
 | 사진 | Wikimedia Commons (CC0 · CC BY · CC BY-SA), 출처는 `/credits` 페이지 |
@@ -23,6 +27,7 @@ src/
   lib/
     ingredients.ts     재료 사전 (그룹, 아이콘, 기본 단위, 부위·종류)
     catalog.ts         처음 DB 가 비었을 때 넣는 기본 레시피 37개
+    guides.ts          집안일 가이드 모델, 기본 목록 23개, 주기 계산 (한국 시간 기준)
     store.ts           Firestore / 로컬 파일 저장소
     auth.ts            로그인 세션
     images.ts          사진 출처 (scripts/fetch-images.mjs 가 생성)

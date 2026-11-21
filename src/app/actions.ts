@@ -88,6 +88,7 @@ export async function saveRecipeAction(id: string | null, input: RecipeInput): P
     }
     await saveRecipe(recipe);
     revalidatePath("/");
+    revalidatePath("/cooking");
     revalidatePath(`/recipes/${recipe.id}`);
     return { id: recipe.id };
   } catch (e) {
@@ -105,6 +106,7 @@ export async function setRecipeImageAction(id: string, image: string): Promise<{
     await saveRecipe({ ...prev, image, updatedAt: Date.now() });
     if (prev.image !== image) await deletePhoto(prev.image);
     revalidatePath("/");
+    revalidatePath("/cooking");
     revalidatePath(`/recipes/${id}`);
     return {};
   } catch (e) {
@@ -117,5 +119,6 @@ export async function deleteRecipeAction(id: string) {
   await deletePhoto((await getRecipe(id))?.image);
   await deleteRecipe(id);
   revalidatePath("/");
-  redirect("/");
+  revalidatePath("/cooking");
+  redirect("/cooking");
 }

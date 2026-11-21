@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Gowun_Batang } from "next/font/google";
 import Link from "next/link";
+import { MainNav } from "@/components/MainNav";
 import { isEditor } from "@/lib/auth";
 import { logout } from "./actions";
 import "./globals.css";
@@ -13,8 +14,8 @@ const gowun = Gowun_Batang({
 });
 
 export const metadata: Metadata = {
-  title: { default: "맘시피 · 엄마의 부엌 노트", template: "%s · 맘시피" },
-  description: "엄마가 해주던 국, 찌개, 요리, 반찬 레시피를 모아두는 곳",
+  title: { default: "맘살림 · 엄마가 알려주는 살림", template: "%s · 맘살림" },
+  description: "청소, 빨래, 집안일, 요리까지 엄마가 알려준 살림법을 모아두는 곳",
 };
 
 export const viewport: Viewport = {
@@ -32,37 +33,37 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         />
       </head>
       <body className="min-h-dvh">
-        <header className="border-b border-line bg-paper/90 backdrop-blur-sm sticky top-0 z-30">
-          <div className="mx-auto flex max-w-5xl items-center justify-between gap-4 px-4 py-3 sm:px-6">
-            <Link href="/" className="flex items-baseline gap-2.5">
-              <span className="font-serif text-2xl font-bold tracking-tight text-ink sm:text-[1.7rem]">맘시피</span>
-              <span className="hidden text-sm text-ink-faint sm:inline">엄마의 부엌 노트</span>
+        <header className="sticky top-0 z-30 border-b border-line bg-paper/90 backdrop-blur-sm">
+          <div className="mx-auto flex max-w-5xl flex-wrap items-center justify-between gap-x-6 px-4 sm:px-6 md:h-16 md:flex-nowrap">
+            <Link href="/" className="flex h-14 items-baseline gap-2.5 pt-4 md:h-auto md:pt-0">
+              <span className="font-serif text-2xl font-bold tracking-tight text-ink sm:text-[1.7rem]">맘살림</span>
+              <span className="hidden text-sm text-ink-faint lg:inline">엄마가 알려주는 살림</span>
             </Link>
-            <nav className="flex items-center gap-2">
+            <nav aria-label="갈래" className="order-last -mx-4 flex h-11 w-[calc(100%+2rem)] items-end px-2 md:order-none md:mx-0 md:h-auto md:w-auto md:flex-1 md:px-0">
+              <MainNav />
+            </nav>
+            <div className="flex items-center gap-2">
               {editor ? (
                 <>
                   <span className="hidden rounded-full bg-sage-soft px-3 py-1 text-sm font-medium text-sage sm:inline">
                     편집 모드
                   </span>
-                  <Link href="/recipes/new" className="btn-primary px-4 py-2 text-[15px]">
-                    + 새 레시피
-                  </Link>
                   <form action={logout}>
                     <button className="btn px-3 py-2 text-[15px] text-ink-soft hover:text-ink">로그아웃</button>
                   </form>
                 </>
               ) : (
                 <Link href="/login" className="btn px-3 py-2 text-[15px] text-ink-soft hover:text-clay">
-                  엄마 로그인
+                  로그인
                 </Link>
               )}
-            </nav>
+            </div>
           </div>
         </header>
         <main>{children}</main>
         <footer className="mx-auto mt-24 max-w-5xl border-t border-line px-4 py-8 text-sm text-ink-faint sm:px-6">
           <div className="flex flex-wrap items-center justify-between gap-3">
-            <p>우리 집 밥상, 엄마 손맛 그대로.</p>
+            <p>엄마한테 배운 살림, 잊어버리지 않게.</p>
             <Link href="/credits" className="underline-offset-4 hover:underline">
               사진 출처
             </Link>

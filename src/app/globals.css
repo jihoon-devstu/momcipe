@@ -20,6 +20,15 @@
 }
 
 @layer base {
+  :root {
+    /* 위에 붙는 헤더 높이 (모바일은 메뉴가 두 번째 줄) — 그 아래 붙는 탭바들이 이 값을 쓴다 */
+    --header-h: 101px;
+  }
+  @media (min-width: 768px) {
+    :root {
+      --header-h: 65px;
+    }
+  }
   html {
     background: var(--color-paper);
     color: var(--color-ink);
